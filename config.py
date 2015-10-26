@@ -33,6 +33,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://kzuqtgovhvixkp:0CxoeTxa0kQ3r51mWPo6-aT90u@HEROKU_POSTGRESQL_WHITE'
 
 
