@@ -33,8 +33,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://kzuqtgovhvixkp:0CxoeTxa0kQ3r51mWPo6-aT90u@HEROKU_POSTGRESQL_WHITE'
 
 
 config = {
