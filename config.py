@@ -34,7 +34,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://kzuqtgovhvixkp:0CxoeTxa0kQ3r51mWPo6-aT90u@ec2-54-83-36-203.compute-1.amazonaws.com/tntec'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://kzuqtgovhvixkp:0CxoeTxa0kQ3r51mWPo6-aT90u@ec2-54-83-36-203.compute-1.amazonaws.com/tntec'
 
 
 config = {
