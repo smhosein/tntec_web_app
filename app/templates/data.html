@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Flasky{% endblock %}
+
+
+{% block head %}
+	{{ super() }}
+{% endblock %}
+
+{% block page_content %}
+        <div class="text-center">
+            
+            <h1>Data Visualizations</h1>
+            <p></p>
+
+        </div>
+		
+
+        <div id="graph-1">
+        </div>
+
+        <div id="graph-2">
+        </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="static/js/script.js"> </script>
+{% endblock %}

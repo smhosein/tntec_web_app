@@ -2,8 +2,194 @@
 
 {% block title %}Flasky{% endblock %}
 
+
+{% block head %}
+	{{ super() }}
+	{% if current_user.is_authenticated %}
+		{{mymap.js}}
+	{% endif %}
+
+<style type="text/css">
+      #view-side { height:600px;width:100%;;margin:0; }
+</style>
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
-</div>
+
+	{% if current_user.is_authenticated %}
+        <div class="text-center">
+            
+            <h1>Erroneous Readings</h1>
+
+            <button class="btn btn-success" id="map-btn">Start Detection</button>
+            <button class="btn btn-danger" id="stop-btn">Stop</button>
+
+            <p></p>
+            <div id="map-canvas">
+                
+                {{mymap.html}}
+            </div>
+
+        </div>
+	{% else %}
+
+            <!-- header start -->
+            <header id="header" class="header-wrapper home-parallax home-fade">
+                <div class="header-overlay"></div>
+                <div class="header-wrapper-inner">
+                    <div class="container">
+
+                        <div class="welcome-speech">
+                            <h1>Welcome to T&TEC's Web Application</h1>
+                            <p>Observe Faults In Real-Time!</p>
+                           
+                        </div><!-- /.intro -->
+                        
+                    </div><!-- /.container -->
+
+                </div><!-- /.header-wrapper-inner -->
+            </header>
+            <!-- /#header -->
+
+            <div class="main-content">
+
+                <!--  begin intro section -->
+
+                <section class="intro bg-light-gray">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <img src="../static/img/intro.jpg" class="img-responsive center-block" alt="intro">
+                            </div>
+
+                            <div class="col-md-7">
+                                <div class="intro-description">
+                                    <h2>Application To Monitor Faults</h2>
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ante ex, fermentum vel libero eget interdum semper libero. Curabitur egestas, arcu id tempor convallis.
+                                    </p>
+
+                                    <ul class="points">
+                                        <li>
+                                            <span>
+                                                <i class="fa fa-star"></i>
+                                            </span>
+                                            Vestibulum pulvinar commodo malesuada.
+                                        </li>
+                                        <li>
+                                            <span>
+                                                <i class="fa fa-star"></i>
+                                            </span>
+                                            Pellentesque id massa et ligula convallis porta.
+                                        </li>
+                                        <li>
+                                            <span>
+                                                <i class="fa fa-star"></i>
+                                            </span>
+                                            Vivamus sed nunc sed ligula rhoncus sit amet eu elit.
+                                        </li>
+                                        <li>
+                                            <span>
+                                                <i class="fa fa-star"></i>
+                                            </span>
+                                            Curabitur in ipsum vel ipsum vehicula congue.
+                                        </li>
+                                    </ul> <!-- end of /.points -->
+                                </div> <!-- end of /.intro-description -->
+                            </div>
+                        </div>
+                    </div> <!-- end of /.container -->
+                </section> 
+                <!--  end of intro section -->
+
+
+                <!--  begin feature section  -->
+                <section class="bg-white feature">
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <div class="feature-content text-center">
+                                    <div class="feature-icon-box">
+                                        <div class="feature-icon center-block">
+                                            <i class="fa fa-laptop"></i>
+                                        </div>
+                                    </div> <!--  end of /.feature-icon-box  -->
+                                    <div class="feature-info">
+                                        <h3 class="feature-heading">Responsive &amp; Multi-purpose</h3>
+                                        <p class="feature-description">
+                                            Class aptent taciti sociosqu ad litora torquent conubia nostra, per inceptos himenaeos.
+                                        </p>  <!--   end of /.feature-description  -->
+                                    </div> <!--   end of /.feature-info  -->
+                                </div> <!--  end of /.feature-content  -->
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="feature-content text-center">
+                                    <div class="feature-icon-box">
+                                        <div class="feature-icon center-block">
+                                            <i class="fa fa-eye"></i>
+                                        </div>
+                                    </div> <!--  end of /.feature-icon-box  -->
+                                    <div class="feature-info">
+                                        <h3 class="feature-heading">Clean &amp; Clear</h3>
+                                        <p class="feature-description">
+                                            Class aptent taciti sociosqu ad litora torquent conubia nostra, per inceptos himenaeos.
+                                        </p>  <!--   end of /.feature-description  -->
+                                    </div> <!--   end of /.feature-info  -->
+                                </div> <!--  end of /.feature-content  -->
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="feature-content text-center">
+                                    <div class="feature-icon-box">
+                                        <div class="feature-icon center-block">
+                                            <i class="fa fa-thumbs-o-up"></i>
+                                        </div>
+                                    </div> <!--  end of /.feature-icon-box  -->
+                                    <div class="feature-info">
+                                        <h3 class="feature-heading">Best UX</h3>
+                                        <p class="feature-description">
+                                            Class aptent taciti sociosqu ad litora torquent conubia nostra, per inceptos himenaeos.
+                                        </p>  <!--   end of /.feature-description  -->
+                                    </div> <!--   end of /.feature-info  -->
+                                </div> <!--  end of /.feature-content  -->
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="feature-content text-center">
+                                    <div class="feature-icon-box">
+                                        <div class="feature-icon center-block">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div> <!--  end of /.feature-icon-box  -->
+                                    <div class="feature-info">
+                                        <h3 class="feature-heading">Good Feedback</h3>
+                                        <p class="feature-description">
+                                            Class aptent taciti sociosqu ad litora torquent conubia nostra, per inceptos himenaeos.
+                                        </p>  <!--   end of /.feature-description  -->
+                                    </div> <!--   end of /.feature-info  -->
+                                </div> <!--  end of /.feature-content  -->
+                            </div>
+
+                        </div>
+                    </div> <!-- end of /.container -->
+                </section>  
+                <!--   end of feature section  -->
+	{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- script for portfolio section using hoverdirection -->
+<!-- <script type="text/javascript">
+//     $(function() {
+
+//         $('.portfolio-item > .item-image').each( function() { $(this).hoverdir({
+//             hoverDelay : 75
+//         }); } );
+
+//     });
+// </script>-->
+<script src="static/js/script.js"> </script>
 {% endblock %}

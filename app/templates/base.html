@@ -6,38 +6,78 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-{% endblock %}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name=viewport content="width=device-width, initial-scale=1">
 
+<!-- style -->
+{% if wf == 1 %}
+<link rel="stylesheet" href="../static/css/bootstrap.min.css">
+{% endif %}
+<link rel="stylesheet" href="../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../static/css/animate.css">
+<link rel="stylesheet" href="../static/css/owl.carousel.css">
+<link rel="stylesheet" href="../static/css/owl.theme.css">
+<link rel="stylesheet" href="../static/css/style.css">
+
+
+<!-- scripts -->
+<script type="text/javascript" src="../static/js/modernizr.custom.97074.js"></script>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="../static/js/html5shiv.js"></script>
+<script src="../static/js/respond.min.js"></script>
+<![endif]-->
+{% endblock %}
+<div id="home-page">
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Flasky</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-                {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</div>
+<!-- site-navigation start -->  
+            <nav id="mainNavigation" class="navbar navbar-dafault main-navigation" role="navigation">
+                <div class="container">
+                    
+                    <div class="navbar-header">
+                        
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        
+                        <!-- navbar logo -->
+                        <div class="navbar-brand">
+                            <span class="sr-only">Avada Pro Agency</span>
+                            <a href={{ url_for('main.index') }}>
+                                <strong>T&TEC Web App</strong>
+                            </a>
+                        </div>
+                        <!-- navbar logo -->
+
+                    </div><!-- /.navbar-header -->
+
+                    <!-- nav links -->
+                    <div class="collapse navbar-collapse" id="main-nav-collapse">
+                        <ul class="nav navbar-nav navbar-right text-uppercase">
+                            <li>
+                                <a href={{ url_for('main.index') }}><span>home</span></a>
+                            </li>
+                            {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('main.data_vis') }}">Data</a></li>
+                            <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                            {% else %}
+                            <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                            {% endif %}
+                        </ul>
+                    </div><!-- nav links -->
+                    
+                </div><!-- /.container -->
+            </nav>
+            <!-- site-navigation end -->
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="containerr">
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -46,10 +86,19 @@
     {% endfor %}
 
     {% block page_content %}{% endblock %}
+<!-- footer here if neccessary -->
 </div>
 {% endblock %}
 
+</div> <!-- end of /#home-page -->
+
 {% block scripts %}
 {{ super() }}
+<script type="text/javascript" src="../static/js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/js/owl.carousel.js"></script>
+<script type="text/javascript" src="../static/js/jquery.hoverdir.js"></script><!-- 
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script> -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
 {{ moment.include_moment() }}
 {% endblock %}

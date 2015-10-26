@@ -17,7 +17,7 @@ def login():
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('Invalid username or password.')
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html', form=form, wf=None)
 
 
 @auth.route('/logout')
@@ -38,4 +38,4 @@ def register():
         db.session.add(user)
         flash('You can now login.')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form, wf=None)
