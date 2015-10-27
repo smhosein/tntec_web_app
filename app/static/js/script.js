@@ -142,47 +142,6 @@ $(document).ready(function () {
         var pie_interval = setInterval(add_to_pie,1000);
 
 
-
-    $("#map-btn").click(function(){
-        map = new google.maps.Map(
-                document.getElementById('view-side'), {
-                center: new google.maps.LatLng(10.383734, -61.244866),
-                zoom: 10,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            });
-        $.get("/get_data", function(data){
-            lat = data['lat'];
-            lon = data['long'];
-            cl = data['color'];
-
-            var i ;
-            for (i = 0; i < lat.length; i++) { 
-                
-                var icon = "";
-                switch (cl[i]) {
-                    case 0:
-                        icon = "125";
-                        break;
-                    case 1:
-                        icon = "063";
-                        break;
-                    case 2:
-                        icon = "129";
-                        break;
-                }
-                // icon = "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0";
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat[i], lon[i]),
-                    map: map,
-                    icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0"
-                });
-            }
-        },"json");
-        // interval = setInterval(generate_map(),1000);
-
-    });
-
-
     $("#map-btn").click(function(){
         map = new google.maps.Map(
                 document.getElementById('view-side'), {
