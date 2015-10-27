@@ -1,4 +1,5 @@
 from flask import render_template, redirect, request, url_for, flash
+from werkzeug.security import generate_password_hash
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
 from . import auth
@@ -34,8 +35,8 @@ def register():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password_hash=form.password.data,
-                    role_id=1)
+                    password_hash=generate_password_hash(form.password.data),
+                    role_id=None)
         db.session.add(user)
         db.session.commit()
         flash('You can now login.')

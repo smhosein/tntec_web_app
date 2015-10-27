@@ -19,54 +19,7 @@ $(document).ready(function () {
 
     var map;
     var interval = null;
-
-
-    // function initialize() {
-    //     var infowindow = new google.maps.InfoWindow();
-    //     var map = new google.maps.Map(
-    //     document.getElementById('map_canvas'), {
-    //       center: new google.maps.LatLng(10.455177, 12.584731),
-    //       zoom: 2,
-    //       mapTypeId: google.maps.MapTypeId.ROADMAP
-          
-    //     });
-    //     console.log("init");
-    //     function addMarker(lat,long,name,content){
-    //     var info = content;
-    //     var message = name;
-    //     var point = new google.maps.LatLng(lat,long);
-    //     var newmarker = new google.maps.Marker({position: point,
-    //                                          map: map,
-    //                                          title: name
-    //                                         });
-    //     // take this block of code out and I get all the markers fine 
-    //      google.maps.event.addListener(newmarker, 'click', function(evt){
-    //           infowindow.setContent(info)
-    //           infowindow.open(map,newmarker)
-    //       });
-    //      console.log("marker");
-    //     }
-
-
-    //         var markers = [{lat:40, long: -117, name:"name1",url:"http://1.google.com"},
-    //                        {lat:40, long: -117.1, name:"name2",url:"http://2.google.com"},
-    //                        {lat:40.1, long: -117, name:"name3",url:"http://3.google.com"}];
-    //         var bounds = new google.maps.LatLngBounds();
-    //         for (var i=0; i < markers.length; i++) {  
-    //              addMarker(markers[i].lat,markers[i].long,markers[i].name, markers[i].url);  
-    //              bounds.extend(new google.maps.LatLng(markers[i].lat,markers[i].long));
-    //         }
-    //         map.fitBounds(bounds);
-    // }
-
-    // google.maps.event.addDomListener(window, 'load', initialize);
-
-
-
-
-    // $("#data-btn").click(function(){
         
-
         $('#graph-1').highcharts({
             chart: {
                 type: 'spline',
@@ -190,60 +143,90 @@ $(document).ready(function () {
 
 
 
-    // });
+    $("#map-btn").click(function(){
+        map = new google.maps.Map(
+                document.getElementById('view-side'), {
+                center: new google.maps.LatLng(10.383734, -61.244866),
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+        $.get("/get_data", function(data){
+            lat = data['lat'];
+            lon = data['long'];
+            cl = data['color'];
+
+            var i ;
+            for (i = 0; i < lat.length; i++) { 
+                
+                var icon = "";
+                switch (cl[i]) {
+                    case 0:
+                        icon = "125";
+                        break;
+                    case 1:
+                        icon = "063";
+                        break;
+                    case 2:
+                        icon = "129";
+                        break;
+                }
+                // icon = "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0";
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(lat[i], lon[i]),
+                    map: map,
+                    icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0"
+                });
+            }
+        },"json");
+        // interval = setInterval(generate_map(),1000);
+
+    });
+
 
     $("#map-btn").click(function(){
-        interval = setInterval(generate_map,1000);
+        map = new google.maps.Map(
+                document.getElementById('view-side'), {
+                center: new google.maps.LatLng(10.383734, -61.244866),
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+        interval = setInterval(function(){
+            $.get("/get_data", function(data){
+                lat = data['lat'];
+                lon = data['long'];
+                cl = data['color'];
+
+                var i ;
+                for (i = 0; i < lat.length; i++) { 
+                    
+                    var icon = "";
+                    switch (cl[i]) {
+                        case 0:
+                            icon = "125";
+                            break;
+                        case 1:
+                            icon = "063";
+                            break;
+                        case 2:
+                            icon = "129";
+                            break;
+                    }
+                    // icon = "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0";
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(lat[i], lon[i]),
+                        map: map,
+                        icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752" + icon + "_en_v0"
+                    });
+                }
+            },"json");
+        }, 1000);
+        
+        // interval = setInterval(generate_map(),1000);
 
     });
 
     $("#stop-btn").click(function(){
         clearInterval(interval);
     });
-
-
-
-    function generate_map() {
-        $.get("/get_data", function(data){
-            lat = data['lat'];
-            lon = data['long'];
-            // value = data['value'];
-            var i ;
-
-            map = new google.maps.Map(
-                document.getElementById('view-side'), {
-                center: new google.maps.LatLng(10.383734, -61.244866),
-                zoom: 10,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            });
-
-            for (i = 0; i < lat.length; i++) { 
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat[i], lon[i]),
-                    map: map,
-                    icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                });
-            }
-        },"json");
-    }
     
-//     $("#loadPortfolio").click(function(event) {
-        
-//         $.get("php/ajax_portfolio.html", function(data){
-//             $('#morePortfolio').append(data);
-//         });
-//         event.preventDefault();
-//         $(this).hide();
-//     }) ;
-// });
-
-// $(document).ready(function () {
-//     $("#loadGallery").click(function(event) {
-        
-//         $.get("php/ajax_gallery.html", function(data){
-//             $('#moreGallery').append(data);
-//         });
-//         event.preventDefault();
-//         $(this).hide();
-//     }) ;
 });
