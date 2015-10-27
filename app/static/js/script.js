@@ -201,7 +201,7 @@ $(document).ready(function () {
                     
                     var icon = "";
                     switch (cl[i]) {
-                        case 0:
+                        case 0:   
                             icon = "125";
                             break;
                         case 1:
