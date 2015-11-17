@@ -11,7 +11,7 @@ app = flask.Flask("app")
 app.SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
 app.SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 app.DEBUG = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:test@localhost/tntecdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kzuqtgovhvixkp:0CxoeTxa0kQ3r51mWPo6-aT90u@ec2-54-83-36-203.compute-1.amazonaws.com/d3kt12dbvma29n'
 db = SQLAlchemy(app)
 #db.create_all()
 from app.models import Meter
