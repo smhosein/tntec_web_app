@@ -51,18 +51,12 @@ def get_data_val():
     num = 1
     all_meters = Meter.query.all()
     for a in all_meters:
-        # print a
-        # temp = {}
-        # temp['meter_id'] = a.meter_id
-        # temp['latitude'] = a.latitude
-        # temp['time'] = a.time
-        # ar.append(temp)
         my_dict['lat'].append(a.latitude)
         my_dict['long'].append(a.longitude)
         num += 1
         if num == 100:
             break
-    # d = {'data': ar}
+
     return jsonify(my_dict)
 
 # @main.route('/get_data')
