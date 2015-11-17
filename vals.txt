@@ -1,21 +1,3 @@
-# from app import db, create_app
-# from app.models import Meter
-import flask
-from flask_sqlalchemy import SQLAlchemy
-import os
-
-
-
-# app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-app = flask.Flask("app")
-app.SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-app.SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-app.DEBUG = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:test@localhost/tntecdb'
-db = SQLAlchemy(app)
-#db.create_all()
-from app.models import Meter
-
 db.session.add(Meter(meter_id=100, latitude=10.3639697602, longitude=-61.2937898751, reading=1, time=7))
 db.session.add(Meter(meter_id=101, latitude=10.3562646559, longitude=-61.2076550396, reading=1, time=4))
 db.session.add(Meter(meter_id=102, latitude=10.313020351, longitude=-61.2396261181, reading=1, time=3))
@@ -9817,7 +9799,3 @@ db.session.add(Meter(meter_id=195, latitude=10.3531108204, longitude=-61.2797885
 db.session.add(Meter(meter_id=196, latitude=10.3053732382, longitude=-61.3167495272, reading=1, time=985))
 db.session.add(Meter(meter_id=197, latitude=10.2310295791, longitude=-61.0446216159, reading=1, time=988))
 db.session.add(Meter(meter_id=198, latitude=10.308280635, longitude=-61.1931468702, reading=1, time=984))
-
-
-
-db.session.commit()

@@ -36,7 +36,7 @@ def register():
         user = User(email=form.email.data,
                     username=form.username.data,
                     password_hash=generate_password_hash(form.password.data),
-                    role_id=None)
+                    )
         db.session.add(user)
         db.session.commit()
         flash('You can now login.')
