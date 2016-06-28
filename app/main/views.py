@@ -1,11 +1,129 @@
+from __future__ import division
 from flask import render_template, jsonify
 from flask.ext.googlemaps import Map
 from flask.ext.login import login_required
 from . import main
-# import random
+import random
 # from .. import db
 from ..models import Meter
 # from ..models import Comment
+
+# sm_ans = []  # smart meter anscestors
+# sm_pon = []  # smart meter pon
+# tr_ans = []
+# tr_pon = []
+# sb_ans = [0, 0]
+# sb_pon = [0, 0]
+# ps_pon = [0]
+
+outage = {'pon': [7, 40, 400, 510, 511, 532, 555, 561, 590, 598], 'time': []}
+trans_outage = {'pon': [7], 'time': []}
+
+pon = []
+for i in range(0, 400):
+    pon.append(0)
+
+# # 2 substation # transformer fault, 10(x2) transformers and 20(x20) meters
+
+# count = 0
+# val = 0
+# for i in range(0, 400):
+#     sm_pon.append(0)
+#     sm_ans.append(val)
+#     count += 1
+#     if count == 20:  # every 20 meters is a new transformer
+#         count = 0
+#         val += 1
+
+# count = 0
+# val = 0
+# for i in range(0, 20):
+#     tr_pon.append(0)
+#     tr_ans.append(val)
+#     count += 1
+#     if count == 10:  # every 10 transformers is a new substation
+#         count = 0
+#         val += 1
+
+# # transformer fault
+# tr_pon[0] = 1
+# for i in range(0, 20):
+#     sm_pon[i] = 1
+
+# substation fault
+# sb_pon[0] = 1
+# for i in range(0, 10):
+#     tr_pon[i] = 1
+# for i in range(0, 200):
+#     sm_pon[i] = 1
+
+# # power generator fault
+# ps_pon[0] = 1
+# for i in range(0, 2):
+#     sb_pon[i] = 1
+# for i in range(0, 20):
+#     tr_pon[i] = 1
+# for i in range(0, 400):
+#     sm_pon[i] = 1
+
+
+def get_ancestor(idx, l, tr_pon, sb_pon, ps_pon, tr_ans, sb_ans):
+    if l == 1:
+        ansc = tr_ans[idx]
+        return tr_pon[ansc]
+    elif l == 2:
+        ansc = sb_ans[idx]
+        return sb_pon[idx]
+    elif l == 3:
+        return ps_pon[0]
+    return 0
+
+
+def get_new_s(l, tr_pon, sb_pon, ps_pon):
+    if l == 1:
+        return tr_pon
+    elif l == 2:
+        return sb_pon
+    return ps_pon
+
+
+# get the lat and lon values for meters from lat_long.txt
+def get_lat_long():
+    lat = []
+    lon = []
+
+    with open("lat_long.txt", "r") as f:
+        for line in f:
+            line = line[:-1]
+            lat_long = line.split()
+            lat.append(lat_long[0])
+            lon.append(lat_long[1])
+    return lat, lon
+
+
+# get the lat and lon value for stations from s_..._long.txt
+def get_stat_lat_long():
+    lat = []
+    lon = []
+
+    with open("stations_lat_long.txt", "r") as f:
+        for line in f:
+            line = line[:-1]
+            lat_long = line.split()
+            lat.append(lat_long[0])
+            lon.append(lat_long[1])
+    return lat, lon
+
+
+def set_faulty_component(faulty, tr_pon, sb_pon, ps_pon):
+    level = faulty['level']
+    index = faulty['index']
+    if level == 2:
+        tr_pon[index] = -1
+    elif level == 3:
+        sb_pon[index] = -1
+    else:
+        ps_pon[0] = -1
 
 
 @main.route('/')
@@ -26,87 +144,253 @@ def data_vis():
     return render_template('data.html', wf=1)
 
 
-# put value logic here!!!!!!!
-@main.route('/get_data/<time>')
+# CCUs
+@main.route('/get_data')
 @login_required
-def get_data(time):
-    my_dict = {'lat': [], 'long': [], 'pon': [], 't': []}
-    print type(time)
-    t1 = int(time.encode('ascii', 'ignore'))
-    t2 = t1 + 10
+def get_data():
+    lat, lon = get_lat_long()
+    my_dict = {'lat': lat, 'long': lon, 'pon': [], 'sub': []}
 
-    all_meters = Meter.query.filter(Meter.time >= t1, Meter.time < t2)
-    for a in all_meters:
-        my_dict['lat'].append(a.latitude)
-        my_dict['long'].append(a.longitude)
-        my_dict['pon'].append(a.reading)
-        my_dict['t'].append(a.time)
+    # determine if any will fail
+    for x in range(0, 400):
+        r = random.random()
+        if r < 0.7:
+            pon[x] = 0
+        else:
+            pon[x] = 1
+
+    my_dict['pon'] = pon
+    count_s1 = 0
+    count_s2 = 0
+    for xx in range(0, 400):
+        if xx < 200 and pon[x] == 1:
+            count_s1 += 1
+        elif pon[x] == 1:
+            count_s2 += 1
+    #see if 30% or more failed, if so then the ccu is bad
+    if count_s1 / 200 >= 0.3:
+        my_dict['sub'].append(1)
+    if count_s2 / 200 >= 0.3:
+        my_dict['sub'].append(2)
+    print count_s1 / 200
+    print count_s2 / 200
     return jsonify(my_dict)
 
 
+# get the meter data points
+@main.route('/get_outage')
+@login_required
+def get_outage():
+
+    to_be_res = outage['pon']
+
+    # remove meters in pon state with 99%
+    for i in to_be_res:
+        r = random.random()
+        if r < 0.95:
+            to_be_res.remove(i)
+
+    # find all the meters that are not in pon list
+    all_m = range(0, 400)
+    aval = [x for x in all_m if x not in to_be_res]
+
+    for i in aval:
+        r = random.random()
+        if r < 0.05:
+            to_be_res.append(i)
+
+    t = []
+    for i in to_be_res:
+        r = random.randint(1, 60)
+        t.append(r)
+
+    outage['pon'] = to_be_res
+    outage['time'] = t
+    cust = len(to_be_res)  # no of cutsomers with pons
+    val = sum(t) / 400
+    out_p = (cust / 400) * 100 # percent of customer with pons
+
+    my_dict = {'val': val, 'cust': cust, 'out_p': out_p}
+    return jsonify(my_dict)
+
+
+# get the trandformer data points
+@main.route('/get_trans_outage')
+@login_required
+def get_trans_outage():
+
+    to_be_res = trans_outage['pon']
+
+    # remove meters in pon state with 99%
+    for i in to_be_res:
+        r = random.random()
+        if r < 0.999:
+            to_be_res.remove(i)
+
+    # find all the meters that are not in pon list
+    all_m = range(0, 10)
+    aval = [x for x in all_m if x not in to_be_res]
+
+    for i in aval:
+        r = random.random()
+        if r < 0.001:
+            to_be_res.append(i)
+
+    t = []
+    for i in to_be_res:
+        r = random.randint(1, 60)
+        t.append(r)
+
+    trans_outage['pon'] = to_be_res
+    trans_outage['time'] = t
+    cust = len(to_be_res)  # no of cutsomers with pons
+    out_p = (cust / 10) * 100  # percent of transformers with pons
+    print out_p
+    my_dict = {'out_p': out_p}
+    return jsonify(my_dict)
+
+
+# get the meter data points
 @main.route('/get_data_points')
 @login_required
 def get_data_val():
     my_dict = {'lat': [], 'long': []}
-    num = 1
-    all_meters = Meter.query.all()
-    for a in all_meters:
-        my_dict['lat'].append(a.latitude)
-        my_dict['long'].append(a.longitude)
-        num += 1
-        if num == 100:
-            break
+    lat, lon = get_lat_long()
 
+    my_dict['lat'] = lat
+    my_dict['long'] = lon
     return jsonify(my_dict)
 
-# @main.route('/get_data')
+
+# get the stations data points
+@main.route('/get_stations_points')
+@login_required
+def get_stations_val():
+    my_dict = {'lat': [], 'long': []}
+    lat, lon = get_stat_lat_long()
+
+    my_dict['lat'] = lat
+    my_dict['long'] = lon
+    return jsonify(my_dict)
+
+
+# get all the faults
+@main.route('/get_faults')
+@login_required
+def get_faults():
+
+    sm_ans = []  # smart meter anscestors
+    sm_pon = []  # smart meter pon
+    tr_ans = []
+    tr_pon = []
+    sb_ans = [0, 0]
+    sb_pon = [0, 0]
+    ps_pon = [0]
+
+    count = 0
+    val = 0
+    for i in range(0, 400):
+        sm_pon.append(0)
+        sm_ans.append(val)
+        count += 1
+        if count == 20:  # every 20 meters is a new transformer
+            count = 0
+            val += 1
+
+    count = 0
+    val = 0
+    for i in range(0, 20):
+        tr_pon.append(0)
+        tr_ans.append(val)
+        count += 1
+        if count == 10:  # every 10 transformers is a new substation
+            count = 0
+            val += 1
+
+    r = random.randint(1, 6)
+
+    if r == 1:  # tranformer faulty
+        tr_pon[0] = 1
+        for i in range(0, 20):
+            sm_pon[i] = 1
+
+    elif r == 2:  # substation fault
+        sb_pon[0] = 1
+        for i in range(0, 10):
+            tr_pon[i] = 1
+        for i in range(0, 200):
+            sm_pon[i] = 1
+
+    elif r == 3:  # power generator fault
+        ps_pon[0] = 1
+        for i in range(0, 2):
+            sb_pon[i] = 1
+        for i in range(0, 20):
+            tr_pon[i] = 1
+        for i in range(0, 400):
+            sm_pon[i] = 1
+
+    if r == 1 or r == 2 or r == 3:
+        S = sm_pon
+        F = 0
+        L = 1
+        faulty = {'level': '-1', 'index': '-1'}
+
+        while F == 0:
+            idx = 0
+            for x in S:
+                if x == 1:  # if there is a fault
+                    ancestor = get_ancestor(idx, L, tr_pon, sb_pon, ps_pon, tr_ans, sb_ans)  # check the ancestor
+                    if ancestor == 1:  # if there ansc is faulty keep going up tree
+                        faulty['level'] = L
+                        faulty['index'] = idx
+                        S = get_new_s(L, tr_pon, sb_pon, ps_pon)
+                        L += 1
+                        break
+                    else:  # if the acestor is not faulty the current node is
+                        faulty['level'] = L
+                        faulty['index'] = idx
+                        F = 1
+                        break
+                idx += 1
+
+        print faulty
+        set_faulty_component(faulty, tr_pon, sb_pon, ps_pon)
+        
+    s_lat, s_lon = get_stat_lat_long()
+    sm_lat, sm_lon = get_lat_long()
+
+    my_dict = {'sm_pon': sm_pon, 'tr_pon': tr_pon, 'sb_pon': sb_pon, 'ps_pon': ps_pon, 'sm_lat': sm_lat, 'sm_lon': sm_lon, 's_lat': s_lat, 's_lon': s_lon}
+    return jsonify(my_dict)
+
+
+# @main.route('/get_data_points')
 # @login_required
-# def get_data():
-#     random.seed()
-#     my_dict = {'lat': [], 'long': [], 'value': [], 'color': []}
-#     my_dict['lat'] = [10.369511810935023, 10.3249536464279, 10.44845177450669, 10.315779911303764, 10.34928856232442, 10.474297381829183, 10.292645276490086, 10.404372122193637, 10.340457643581344, 10.375100230211661, 10.41610326401047, 10.437301562788798, 10.477611632080984, 10.292586126572925, 10.310528505409827, 10.344306112405816, 10.463373248907837, 10.393530436802482, 10.29673283522537, 10.45254757953238, 10.328593793737209, 10.291118973811725, 10.447330572885926, 10.390430747130555, 10.313671626994282, 10.358568963549619, 10.306317140378887, 10.30305516663687, 10.445223950404952, 10.370380300510298, 10.332830375228152, 10.407184554194833, 10.307630500866155, 10.316721561315926, 10.4479451348723, 10.37976067804487, 10.370676109798888, 10.426248640157928, 10.347618647552107, 10.373345185200204, 10.361851388368578, 10.418404643349703, 10.388804769775318, 10.387755938864283, 10.296288724762304, 10.376022252559288, 10.367821071629304, 10.39146740968463, 10.316893288106442, 10.477469639712188, 10.290797565957567, 10.390817690263242, 10.302282681068439, 10.374549666069765, 10.380745070161014, 10.371036162907425, 10.373151493854806, 10.463322307125464]
-#     my_dict['long'] = [-61.22924773977311, -61.182201749728534, -61.214171493219766, -61.24073212807202, -61.29486666466272, -61.14555460149211, -61.17283379254275, -61.26854480281618, -61.20987303057301, -61.20769370290508, -61.31827037105756, -61.14838335019776, -61.22220063589066, -61.34405497116832, -61.156665545720834, -61.271636879667916, -61.28199323900871, -61.257659808475175, -61.22795675485962, -61.31358221632252, -61.262291958457034, -61.24554530027669, -61.21328781224818, -61.173840851845284, -61.231418904627375, -61.22460509057727, -61.18976345978544, -61.311593250841355, -61.1553272151553, -61.262049833650345, -61.28992532160689, -61.30917391785586, -61.253719028263795, -61.21512103375676, -61.189363722124924, -61.27535174875584, -61.343864285018135, -61.2785345554729, -61.32888099351596, -61.22829620653988, -61.17095689092052, -61.29658435163784, -61.162759236470684, -61.22444502625221, -61.24698877669565, -61.264640023986225, -61.22787899013312, -61.246886848241815, -61.256596636509286, -61.261831261356434, -61.34429991466353, -61.33475141163558, -61.32311471747461, -61.14632838684725, -61.25313794323832, -61.24464356303155, -61.19962295988667, -61.20529193053245]
-#     for i in xrange(len(my_dict['lat'])):
-#         val = random.randint(0, 100)
-#         if val < 21:
-#             my_dict['color'].append(1)
-#         elif val > 89:  # assume this is PON
-#             my_dict['color'].append(0)
-#         else:
-#             my_dict['color'].append(2)
+# def get_data_val():
+#     my_dict = {'lat': [], 'long': []}
+#     num = 1
+#     all_meters = Meter.query.all()
+#     for a in all_meters:
+#         my_dict['lat'].append(a.latitude)
+#         my_dict['long'].append(a.longitude)
+#         num += 1
+#         if num == 100:
+#             break
 
 #     return jsonify(my_dict)
 
+# @main.route('/get_data/<time>')
+# @login_required
+# def get_data(time):
+#     my_dict = {'lat': [], 'long': [], 'pon': [], 't': []}
+#     print type(time)
+#     t1 = int(time.encode('ascii', 'ignore'))
+#     t2 = t1 + 10
 
-# @main.route('/map')
-# def map():
-#     return render_template('map.html')
-
-
-# @main.route('/tmap')
-# def tmap():
-#     # creating a map in the view
-#     mymap = Map(
-#         identifier="view-side",
-#         lat=37.4419,
-#         lng=-122.1419,
-#         markers=[]
-#     )
-#     return render_template('tmap.html', mymap=mymap)
-
-
-# @main.route('/register-comment', methods=['GET', 'POST'])
-# def register_comment():
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         comment = Comment(email=form.email.data,
-#                     username=form.username.data,
-#                     password=form.password.data)
-#         db.session.add(comment)
-#         flash('Comment Added.')
-#     return render_template('/', form=form)
-
-
-# @main.route('/get-comments')
-# def get_comments():
-#     return render_template('map.html')
+#     all_meters = Meter.query.filter(Meter.time >= t1, Meter.time < t2)
+#     for a in all_meters:
+#         my_dict['lat'].append(a.latitude)
+#         my_dict['long'].append(a.longitude)
+#         my_dict['pon'].append(a.reading)
+#         my_dict['t'].append(a.time)
+#     return jsonify(my_dict)

@@ -19,10 +19,20 @@
 	{% if current_user.is_authenticated %}
         <div class="text-center">
             
-            <h1>Erroneous Readings</h1>
+           <!--  <h1>Erroneous Readings</h1> -->
 
-            <button class="btn btn-success" id="map-btn">Start Detection</button>
-            <button class="btn btn-danger" id="stop-btn">Stop</button>
+            <!-- <button class="btn btn-success" id="map-btn">Show Grid</button> -->
+            <button class="btn btn-success" id="map-btn-fault">Find Faults</button>
+            <button class="btn btn-success" id="map-btn-ccu">Start CCU Detection</button>
+            <!-- <button class="btn btn-success" id="map-btn-fault-ccu">Find CCU</button> -->
+            <br><p></p>
+
+            <button class="btn btn-danger" id="stop-btn">STOP</button>
+            <!-- <button class="btn btn-warning" id="pause-ccu-btn" style="display:none;">Pause</button>
+            <button class="btn btn-warning" id="res-fault-btn" style="display:none;">Resume</button>
+            <button class="btn btn-warning" id="res-ccu-btn" style="display:none;">Resume</button> -->
+            <!-- <button class="btn btn-warning" id="clear-btn">Clear</button> -->
+            
 
             <p></p>
             <div id="map-canvas">

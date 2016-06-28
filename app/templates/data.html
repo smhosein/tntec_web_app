@@ -12,7 +12,7 @@
             
             <h1>Data Visualizations</h1>
             <p></p>
-
+            <!-- <button class="btn btn-success" id="graph-outage">Show Graph</button> -->
         </div>
 		
 
@@ -22,9 +22,13 @@
         <div id="graph-2">
         </div>
 
+        <div id="graph-3">
+        </div>
+
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script src="static/js/script.js"> </script>
 {% endblock %}
